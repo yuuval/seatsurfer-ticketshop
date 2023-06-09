@@ -1,0 +1,26 @@
+{
+  "name": "project-template",
+  "scripts": {
+    "dev": "concurrently --kill-others \"npm run lint-watch\" \"next dev\"",
+    "build:app": "concurrently --kill-others \"npm run build\"",
+    "start": "concurrently --kill-others \"next start\"",
+    "build": "next build",
+    "lint": "next lint",
+    "lint-watch": "nodemon --watch . --exec npm run lint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^7.1.0",
+    "jwt-decode": "^3.1.2",
+    "next": "^12.1.5",
+    "nodemon": "^2.0.15",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "eslint": "8.4.1",
+    "eslint-config-next": "12.0.7"
+  }
+}
