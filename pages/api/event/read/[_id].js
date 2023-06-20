@@ -7,9 +7,14 @@ export default async function handler(req, res) {
         return
     }
 
+    const eventId = req.query
+
     try {
         await connectMongoDB()
-        const events = await Event.find()
+        const events = await Event.findById(eventId)
+        if (!events) {
+            return res.status(404).json({ message: "Event not found." });
+        }
         res.status(200).send(events)
     } catch (e) {
         console.log(e)
