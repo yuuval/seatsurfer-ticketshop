@@ -1,16 +1,17 @@
 import styles from "./index.module.css"
 import {useEffect, useState} from "react";
-import axios from "axios";
-import {createEvent, createTask, createTicket, createUser, getAllEvents, getAllUsers} from "@lib/api";
-import {Schema} from "mongoose";
+import {createEvent, createTicket, createUser, getAllEvents, getAllUsers} from "@lib/api";
 import Link from "next/link";
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+
 
 export default function IndexPage() {
 
-    const [input, setInput] = useState("")
     const [event, setEvent] = useState([])
-    const [user, setUser] = useState([])
     const [updateUIFlag, setUpdateUIFlag] = useState(false)
+    const [searchTerm, setSearchTerm] = useState("")
+
 
 
     useEffect(() => {
@@ -31,115 +32,28 @@ export default function IndexPage() {
         loadEventsAndUsers()
     }, [updateUIFlag])
 
-    const handleSubmitEvent = async (e) => {
-        setUpdateUIFlag(false)
-        e.preventDefault();
-        try {
-            await createEvent({
-                name: "123",
-                location: "123",
-                description: "123",
-                host_id: "123",
-                date: new Date(),
-                ticket_amount: 123
-            });
-            setInput(""); // Clear the input field after successful submission
-            setUpdateUIFlag(true)
-        } catch (error) {
-            console.error("Error creating event:", error);
-            // Handle the error, such as displaying an error message to the user
-        }
-    }
-
-    const handleSubmitTicket = async (e) => {
-        setUpdateUIFlag(false)
-        e.preventDefault();
-        try {
-            await createTicket({
-                event_id: "123",
-                price: 123,
-                buyer_id: "123",
-            });
-            setInput(""); // Clear the input field after successful submission
-            setUpdateUIFlag(true)
-        } catch (error) {
-            console.error("Error creating event:", error);
-            // Handle the error, such as displaying an error message to the user
-        }
-    }
-
-    const handleSubmitUser = async (e) => {
-        setUpdateUIFlag(false)
-        e.preventDefault();
-        try {
-            await createUser({
-                firstname: "123",
-                lastname: "123",
-                birthdate: new Date(),
-                role: "visitor",
-                email: "valmir@gmail.com",
-                password: "Non hashed passwort weil zu faul",
-            });
-            setInput(""); // Clear the input field after successful submission
-            setUpdateUIFlag(true)
-        } catch (error) {
-            console.error("Error creating event:", error);
-            // Handle the error, such as displaying an error message to the user
-        }
-    }
-
     return (
         <div className={styles.posts}>
-            <h1>Event</h1>
 
-            <form onSubmit={handleSubmitEvent}>
-                <input type="text" value={input} onChange={(e) => {
-                    setInput(e.target.value)
-                }}/>
-                <button type="submit">Send Event</button>
-            </form>
-
-            <h2>Get Events:</h2>
-            {event.map((t) => {
-                return (
-                    <div key={t._id}>
-                        {t.name}
-                        <Link href={`/events/${t._id}`} passHref>
-                            <a>Read more</a>
-                        </Link>
-                    </div>
-                )
-            })}
-
-            <h1>Ticket</h1>
-
-            <form onSubmit={handleSubmitTicket}>
-                <input type="text" value={input} onChange={(e) => {
-                    setInput(e.target.value)
-                }}/>
-                <button type="submit">Send Ticket</button>
-            </form>
-
-            <h1>User</h1>
-
-            <form onSubmit={handleSubmitUser}>
-                <input type="text" value={input} onChange={(e) => {
-                    setInput(e.target.value)
-                }}/>
-                <button type="submit">Send User</button>
-            </form>
-
-            <h2>Get Users:</h2>
-            {user.map((t) => {
-                return (
-                    <div key={t._id}>
-                        {t.firstname}
-                        <Link href={`/users/${t._id}`} passHref>
-                            <a>Read more</a>
-                        </Link>
-                    </div>
-                )
-            })}
+            <h3 className={styles.searchBarTitle}>Searchbar <span>&#128270;</span></h3>
+            <Form.Control className={styles.searchBar} type={"text"} placeholder="Search..." onChange={event => {
+                setSearchTerm(event.target.value)
+            }}/>
+            <Link className={styles.searchBarTitle} href={"/events/create"} passHref><a>Create Event</a></Link>
+            {
+                event.filter(e => e.name.toLowerCase().includes(searchTerm.toLowerCase()) || e.location.toLowerCase().includes(searchTerm.toLowerCase())).map((event) => {
+                    return (
+                        <div key={event.id} className={styles.key}>
+                            <h1 className={styles.title}>{event.name}</h1>
+                            <p>Location: {event.location}.-</p>
+                            <p>Description: {event.description.slice(0, 25) + "..."}</p>
+                            <Link href={`/events/${event._id}`} passHref>
+                                <a>Read more</a>
+                            </Link>
+                        </div>
+                    )
+                })
+            }
         </div>
     )
 }

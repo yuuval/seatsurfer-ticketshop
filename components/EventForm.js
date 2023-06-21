@@ -1,44 +1,36 @@
 import {useRouter} from "next/router";
-import {useEffect, useRef, useState} from "react";
-import {createUser, updateUser} from "@lib/api";
+import {useEffect, useState} from "react";
+import {createEvent} from "@lib/api";
 import Form from 'react-bootstrap/Form';
 import styles from "./UserForm.module.css"
 
 // Das Standard Model des Formulares.
 const defaultModel = {
-    firstname: "", lastname: "", birthdate: null, role: "", email: "", password: ""
+    name: "", location: "", description: "", date: null, ticket_amount: "", host_id: "123"
 }
 
 // Funktion zum Valdieren des Modelles. Hierzu geben wir den erstellten Beitrag mit.
-function validateModel(user) {
+function validateModel(event) {
     const errors = {
-        firstname: "", lastname: "", birthdate: null, role: "", email: "", password: ""
+        name: "", location: "", description: "", date: null, ticket_amount: ""
     }
     let isValid = true;
 
     // .trim nimmt jegliche Leerzeichen aus einem Text heraus.
-    if (user.firstname.trim().length === 0) {
-        errors.firstname = "Firstname can't be empty"
+    if (event.name.trim().length === 0) {
+        errors.name = "Name can't be empty"
         isValid = false;
     }
-    if (user.lastname.trim().length === 0) {
-        errors.lastname = "Lastname can't be empty"
+    if (event.location.trim().length === 0) {
+        errors.location = "Location can't be empty"
         isValid = false;
     }
-    if (user.birthdate === null) {
-        errors.birthdate = "Birthdate can't be empty"
+    if (event.date === null) {
+        errors.date = "Date can't be empty"
         isValid = false;
     }
-    if (user.role.trim().length === 0) {
-        errors.role = "Role can't be empty"
-        isValid = false;
-    }
-    if (user.email.trim().length === 0) {
-        errors.email = "Email can't be empty"
-        isValid = false;
-    }
-    if (user.password.trim().length === 0) {
-        errors.password = "password can't be empty"
+    if (event.ticket_amount === 0) {
+        errors.email = "Ticket can't 0"
         isValid = false;
     }
 
@@ -55,9 +47,9 @@ function validateModel(user) {
 //})
 
 
-export default function UserForm({session, userToEdit}) {
+export default function EventForm({}) {
     const router = useRouter()
-    const [user, setUser] = useState(defaultModel)
+    const [event, setEvent] = useState(defaultModel)
     const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState(defaultModel)
 
@@ -75,19 +67,12 @@ export default function UserForm({session, userToEdit}) {
     //    setBase64Image(base64)
     //}
 
-    // Da überprüfen wir, ob der User im Edit Mode ist oder nicht
-    useEffect(() => {
-        if (userToEdit) {
-            setUser(userToEdit)
-        }
-    }, [userToEdit])
-
     // Da überprüfen wir jegliche Eingaben des Benutzers und geben zuletzt das zurück, was er geschrieben hat.
     const handleChange = (e) => {
         const field = e.target.name
         const value = e.target.value
-        setUser({
-            ...user, [field]: value
+        setEvent({
+            ...event, [field]: value
         })
     }
     // Bild validierung
@@ -106,13 +91,13 @@ export default function UserForm({session, userToEdit}) {
         setErrors(defaultModel)
         //handleImageValidation(setIsLoading(false))
 
-        const result = validateModel(user)
+        const result = validateModel(event)
 
-        //if (!result.isValid) {
-        //    setErrors(result.errors)
-        //    setIsLoading(false)
-        //    return
-        //}
+        if (!result.isValid) {
+            setErrors(result.errors)
+            setIsLoading(false)
+            return
+        }
         //if (!base64Image) return
 
         // Schicken wir das Bild an dieses File, welches dies dann im Public Ordner speichert.
@@ -126,21 +111,13 @@ export default function UserForm({session, userToEdit}) {
         // Da nehmen wir die Response und setzen den Filepath in die Db herein
         //const data = await response.json()
         //setImagePath(data.filePath)
-        //user.image = data.filePath
+        //event.image = data.filePath
 
         // Wenn die PostId vorhanden ist gehen wir in den Edit Modus
-        if (user._id) {
-            await updateUser(user)
-            console.log(user)
-            alert("User updated!")
-            await router.push(`/users/${user._id}`)
-            // Sonst erstellen wir diesen Post.
-        }
-        else {
-            const newUser = await createUser(user)
-            alert("User created!")
-            await router.push(`/users/${newUser._id}`)
-        }
+        console.log(event)
+        const newEvent = await createEvent(event)
+        alert("Event created!")
+        await router.push(`/events/${newEvent._id}`)
         setIsLoading(false)
     }
 
@@ -148,9 +125,10 @@ export default function UserForm({session, userToEdit}) {
         <>
             <form onSubmit={handleSubmit}>
                 <fieldset className={styles.form}>
-                    <p>Firstname:</p>
-                    <Form.Control type="text" name="firstname" onChange={handleChange} value={user.firstname} required/>
-                    {errors.firstname && <div className={styles.error}>{errors.firstname}</div>}
+                    <p>Name:</p>
+                    <Form.Control type="text" name="name" onChange={handleChange} value={event.name}
+                                  required/>
+                    {errors.name && <div className={styles.error}>{errors.name}</div>}
                 </fieldset>
 
                 {/*<fieldset className={styles.form}>*/}
@@ -167,39 +145,37 @@ export default function UserForm({session, userToEdit}) {
                 {/*</fieldset>*/}
 
                 <fieldset className={styles.form}>
-                    <p>Lastname:</p>
-                    <Form.Control type="text" name="lastname" onChange={handleChange} value={user.lastname} required/>
-                    {errors.lastname && <div className={styles.error}>{errors.lastname}</div>}
+                    <p>Location:</p>
+                    <Form.Control type="text" name="location" onChange={handleChange} value={event.location} required/>
+                    {errors.location && <div className={styles.error}>{errors.location}</div>}
                 </fieldset>
 
                 <fieldset className={styles.form}>
-                    <p>Birthdate:</p>
-                    <Form.Control type="date" name="birthdate" onChange={handleChange} value={user.birthdate ? user.birthdate : new Date()}/>
-                    {errors.birthdate && <div className={styles.error}>{errors.birthdate}</div>}
+                    <p>Description:</p>
+                    <Form.Control name="description" onChange={handleChange} value={event.description} required/>
+                    {errors.description && <div className={styles.error}>{errors.description}</div>}
                 </fieldset>
 
                 <fieldset className={styles.form}>
-                    <p>Role:</p>
-                    <Form.Control name="role" onChange={handleChange} value={user.role} required/>
-                    {errors.role && <div className={styles.error}>{errors.role}</div>}
+                    <p>Date:</p>
+                    <Form.Control type="date" name="date" onChange={handleChange}
+                                  value={event.date ? event.date : new Date()}/>
+                    {errors.date && <div className={styles.error}>{errors.date}</div>}
                 </fieldset>
 
                 <fieldset className={styles.form}>
-                    <p>Email:</p>
-                    <Form.Control name="email" onChange={handleChange} value={user.email} required/>
-                    {errors.email && <div className={styles.error}>{errors.email}</div>}
+                    <p>Ticket Amount:</p>
+                    <Form.Control type="number" name="ticket_amount" onChange={handleChange} value={event.ticket_amount} required/>
+                    {errors.ticket_amount && <div className={styles.error}>{errors.ticket_amount}</div>}
                 </fieldset>
 
-                <fieldset className={styles.form}>
-                    <p>Password:</p>
-                    <Form.Control name="password" onChange={handleChange} value={user.password} required/>
-                    {errors.password && <div className={styles.error}>{errors.password}</div>}
+                <fieldset style={{visibility: "hidden"}} className={styles.form}>
+                    <Form.Control name="host_id" onChange={handleChange} value={event.host_id} required/>
                 </fieldset>
 
                 <button disabled={isLoading} onSubmit={handleSubmit}>
                     {isLoading ? "...Loading" : "Submit"}
                 </button>
-
             </form>
 
 

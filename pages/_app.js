@@ -17,6 +17,14 @@ export default function App({ Component, pageProps }) {
                 <Link href="/" passHref>
                     SeatSurfer
                 </Link>
+                <p></p>
+                <Link href="/login" passHref>
+                    Login
+                </Link>
+                <p></p>
+                <Link href="/profil" passHref>
+                    Profil
+                </Link>
             </Header>
 
             <main className="page">

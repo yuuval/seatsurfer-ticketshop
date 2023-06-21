@@ -4,3 +4,36 @@
     justify-content: center;
     align-items: center;
 }
+
+.searchBarTitle {
+    margin-top: 1em;
+    text-align: left;
+    width: 100%;
+    font-size: 1em;
+    margin-bottom: -0.5em;
+}
+
+.key {
+    border-style: solid;
+    margin-top: 10em;
+    border-width: 3px;
+    padding: 2em;
+    text-align: center;
+    font-size: 1em;
+}
+
+.searchBar {
+    margin-top: 1em;
+    width: 100%;
+    margin-bottom: 1em;
+    font-size: 1em;
+}
+
+.title {
+    font-style: italic;
+    font-size: 2em;
+    line-height: 1.1;
+    max-inline-size: 15ch;
+    margin: auto;
+    font-weight: bold;
+}
