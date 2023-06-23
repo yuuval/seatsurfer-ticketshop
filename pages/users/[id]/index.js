@@ -44,7 +44,7 @@ export default function IndexPage() {
                 return (
                     <div key={t._id}>
 
-                        {t.price}
+                        {t.event_id}
                     </div>
                 )
             })}
